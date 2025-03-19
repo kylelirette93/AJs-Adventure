@@ -64,6 +64,15 @@ public class InputManager : MonoBehaviour, GameInput.IPlayerActions
             Actions.DashEvent?.Invoke();
         }
     }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            Debug.Log("Jump performed");
+            Actions.JumpEvent?.Invoke();
+        }
+    }
 }
 
 public static class Actions
@@ -71,6 +80,7 @@ public static class Actions
     // Define events for each action.
     public static Action<Vector2> MoveEvent;
     public static Action DashEvent;
+    public static Action JumpEvent;
     public static Action ShiftKeyPressed;
     public static Action ShiftKeyReleased;
     public static Action StartInteractEvent;

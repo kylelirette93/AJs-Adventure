@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 
 public class PlayerController : MonoBehaviour
@@ -13,8 +14,9 @@ public class PlayerController : MonoBehaviour
     bool isFacingRight = true;
     bool shiftHeld = false;
 
+    public LayerMask layersForRaycast;
 
-    // Movement speed of the player.
+    // Movement settings for the player.
     [Header("Movement Settings")]
     [SerializeField] float moveSpeed = 3.0f;
     [SerializeField] float newSpeed;
@@ -22,6 +24,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] bool isRunning = false;
     [SerializeField] bool wasRunning = false;
     [SerializeField] bool isGrounded = false;
+
+    // Jump settings for the player.
+    [Header("Jump Settings")]
+    [SerializeField] float jumpForce = 50f;
+    [SerializeField] bool isJumping = false;
+    [SerializeField] Transform groundCheck;
 
 
     [Header("Dash Settings")]
@@ -38,6 +46,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Ease rotationEase = Ease.OutBack; 
     [SerializeField] Ease scaleEase = Ease.OutBack;
 
+    float lastTimeJumped = -10.0f;
     private void Awake()
     {
         // Get references.
@@ -48,9 +57,13 @@ public class PlayerController : MonoBehaviour
         // Subscribe to the events.
         Actions.MoveEvent += GetInputVector;
         Actions.DashEvent += Dash;
+        Actions.JumpEvent += Jump;
         Actions.ShiftKeyPressed += OnShiftKeyPressed;
         Actions.ShiftKeyReleased += OnShiftKeyReleased;
+
+        newSpeed = moveSpeed;
     }
+    float lastTimeMovedPlayer;
 
     private void FixedUpdate()
     {
@@ -64,11 +77,16 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         isGrounded = IsGrounded();
-        dashTime -= Time.deltaTime;
-        if (dashTime <= 0)
+
+        if (dashTime > 0.0f)
         {
-            newSpeed = moveSpeed;
+            dashTime -= Time.deltaTime;
+            if (dashTime <= 0)
+            {
+                newSpeed = moveSpeed;
+            }
         }
+
         if (moveVector != Vector2.zero)
         {
             // Only handle flip if player is moving.
@@ -115,6 +133,15 @@ public class PlayerController : MonoBehaviour
         runSpeed = 0f;
     }
 
+    void Jump()
+    {
+        if (isGrounded)
+        {
+            rb2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            lastTimeJumped = Time.time;
+        }
+    }
+
     void Dash()
     {       
         if (isRunning)
@@ -148,16 +175,34 @@ public class PlayerController : MonoBehaviour
         CreateDashTrail();
     }
 
+    GameObject hitobject = null; 
+
     bool IsGrounded()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f);
+        if (lastTimeJumped + 0.1f > Time.time)
+            return false;
+
+        
+        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, 1f, layersForRaycast);
         if (hit.collider != null)
         {
+            rb2D.velocity = new Vector2(rb2D.velocity.x, 0.0f);
+            hitobject = hit.collider.gameObject; 
             return true;
         }
-        return false;
+        else
+        {
+            hitobject = null; 
+            return false;
+        }
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Vector3 direction = Vector2.down * 1f;
+        Gizmos.DrawRay(groundCheck.position, direction);
+    }
     void CreateDashTrail()
     {
         // This was a pain in the butt... U.U but it works.
@@ -204,9 +249,13 @@ public class PlayerController : MonoBehaviour
 
     void MovePlayer()
     {
-        float currentSpeed = (runSpeed > 0) ? runSpeed : newSpeed;
-        Vector2 newPosition = rb2D.position + moveVector * currentSpeed * Time.deltaTime;
-        rb2D.MovePosition(newPosition);
+        if (moveVector != Vector2.zero)
+        {
+            float currentSpeed = (runSpeed > 0) ? runSpeed : newSpeed;
+            Vector2 newPosition = rb2D.position + moveVector * currentSpeed * Time.deltaTime;
+            lastTimeMovedPlayer = Time.time;
+            rb2D.MovePosition(newPosition);
+        }
     }
 
 

@@ -2,18 +2,33 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    float cameraSpeed = 0.1f;
-    Transform target;
-    [SerializeField] float yOffset;
+    public float cameraSpeed = 0.1f;
+    public Transform target;
+    public float yOffset = 2f; 
+    public float xOffset = 0f; 
+    public float zOffset = -10f; 
 
     private void Start()
     {
-        target = GameObject.Find("Player").transform;
+        if (target == null)
+        {
+            GameObject player = GameObject.Find("Player");
+            if (player != null)
+            {
+                target = player.transform;
+            }
+            else
+            {
+                Debug.LogError("Player GameObject not found. Please ensure a GameObject named 'Player' exists in the scene.");
+            }
+        }
     }
 
     private void LateUpdate()
     {
-        Vector3 newPosition = new Vector3(target.position.x, target.position.y, transform.position.z);
-        transform.position = Vector3.Slerp(transform.position, newPosition + new Vector3(0, yOffset, 0), cameraSpeed);
+        if (target == null) return; 
+
+        Vector3 desiredPosition = target.position + new Vector3(xOffset, yOffset, zOffset);
+        transform.position = Vector3.Slerp(transform.position, desiredPosition, cameraSpeed * Time.deltaTime);
     }
 }
