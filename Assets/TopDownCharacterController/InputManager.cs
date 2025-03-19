@@ -30,15 +30,15 @@ public class InputManager : MonoBehaviour, GameInput.IPlayerActions
 
     public void OnRun(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.started)
         {
             Debug.Log("Should be running.");
-            Actions.StartRunEvent?.Invoke();
+            Actions.ShiftKeyPressed?.Invoke();
         }
         if (context.canceled)
         {
             Debug.Log("Should stop running.");
-            Actions.StopRunEvent?.Invoke();
+            Actions.ShiftKeyReleased?.Invoke();
         }
     }
 
@@ -71,8 +71,8 @@ public static class Actions
     // Define events for each action.
     public static Action<Vector2> MoveEvent;
     public static Action DashEvent;
-    public static Action StartRunEvent;
-    public static Action StopRunEvent;
+    public static Action ShiftKeyPressed;
+    public static Action ShiftKeyReleased;
     public static Action StartInteractEvent;
     public static Action CancelInteractEvent;
 }

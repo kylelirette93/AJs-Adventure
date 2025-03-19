@@ -117,7 +117,6 @@ GameObject:
   - component: {fileID: 2030349662479877538}
   - component: {fileID: 6897782806256424437}
   - component: {fileID: 7417280090794700315}
-  - component: {fileID: 2452999538830704156}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -156,6 +155,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 4
   newSpeed: 0
+  runSpeed: 0
+  isRunning: 0
+  wasRunning: 0
+  isGrounded: 0
   isDashing: 0
   dashDirection: {x: 0, y: 0}
   dashSpeed: 20
@@ -195,51 +198,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!61 &2452999538830704156
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3410949393802815102}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.004673714, y: -0.0070104823}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.16, y: 0.16}
-    newSize: {x: 0.16, y: 0.16}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.10265197, y: 0.0886306}
-  m_EdgeRadius: 0
 --- !u!1 &5057317773114017378
 GameObject:
   m_ObjectHideFlags: 0

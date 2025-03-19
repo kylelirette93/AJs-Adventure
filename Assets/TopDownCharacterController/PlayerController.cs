@@ -11,15 +11,17 @@ public class PlayerController : MonoBehaviour
     Vector2 moveVector;
     Vector2 lastMoveVector;
     bool isFacingRight = true;
+    bool shiftHeld = false;
 
 
     // Movement speed of the player.
     [Header("Movement Settings")]
-    [SerializeField] float moveSpeed = 2.0f;
+    [SerializeField] float moveSpeed = 3.0f;
     [SerializeField] float newSpeed;
     [SerializeField] float runSpeed = 0f;
     [SerializeField] bool isRunning = false;
     [SerializeField] bool wasRunning = false;
+    [SerializeField] bool isGrounded = false;
 
 
     [Header("Dash Settings")]
@@ -36,8 +38,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Ease rotationEase = Ease.OutBack; 
     [SerializeField] Ease scaleEase = Ease.OutBack;
 
-    private Quaternion originalRotation;
-
     private void Awake()
     {
         // Get references.
@@ -48,24 +48,22 @@ public class PlayerController : MonoBehaviour
         // Subscribe to the events.
         Actions.MoveEvent += GetInputVector;
         Actions.DashEvent += Dash;
-        Actions.StartRunEvent += StartRun;
-        Actions.StopRunEvent += StopRun;
+        Actions.ShiftKeyPressed += OnShiftKeyPressed;
+        Actions.ShiftKeyReleased += OnShiftKeyReleased;
     }
 
     private void FixedUpdate()
     {
-        // Handle movement in fixed update for physics calculations.
-        MovePlayer();
-        if (isRunning)
+        if (isGrounded)
         {
-            float tiltAmount = isFacingRight ? -4f : 4f;
-            Quaternion tiltRotation = Quaternion.Euler(0, 0, tiltAmount);
-            transform.localRotation = Quaternion.identity * tiltRotation; // apply tilt.
+            // Handle movement in fixed update for physics calculations.
+            MovePlayer();
         }
     }
 
     private void Update()
     {
+        isGrounded = IsGrounded();
         dashTime -= Time.deltaTime;
         if (dashTime <= 0)
         {
@@ -77,20 +75,42 @@ public class PlayerController : MonoBehaviour
             Flip();
         }
 
-        animator.SetFloat("Speed", runSpeed);
+        animator.SetBool("IsRunning", isRunning);
         animator.SetBool("IsMoving", moveVector != Vector2.zero);
-        animator.speed = (moveVector != Vector2.zero) ? 1 : 0;
+
+        if (shiftHeld && moveVector != Vector2.zero && !isRunning)
+        {
+            StartRun();
+        }
+        else if (isRunning && shiftHeld && moveVector == Vector2.zero)
+        {
+            StopRun();
+        }
+    }
+
+    private void OnShiftKeyPressed()
+    {
+        shiftHeld = true;
+        StartRun();
+    }
+
+    private void OnShiftKeyReleased()
+    {
+        shiftHeld = false;
+        StopRun();
     }
 
     void StartRun()
     {
-        isRunning = true;
-        runSpeed = moveSpeed * 3f;
+        if (shiftHeld && moveVector != Vector2.zero)
+        {
+            isRunning = true;
+            runSpeed = moveSpeed * 2f;
+        }
     }
 
     void StopRun()
     {
-        transform.localRotation = originalRotation;
         isRunning = false;
         runSpeed = 0f;
     }
@@ -126,6 +146,16 @@ public class PlayerController : MonoBehaviour
         transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0.2f), dashDuration, 10, 1).SetEase(scaleEase);
 
         CreateDashTrail();
+    }
+
+    bool IsGrounded()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f);
+        if (hit.collider != null)
+        {
+            return true;
+        }
+        return false;
     }
 
     void CreateDashTrail()
@@ -176,33 +206,9 @@ public class PlayerController : MonoBehaviour
     {
         float currentSpeed = (runSpeed > 0) ? runSpeed : newSpeed;
         Vector2 newPosition = rb2D.position + moveVector * currentSpeed * Time.deltaTime;
-        newPosition = ClampPositionToCameraBounds(newPosition);
         rb2D.MovePosition(newPosition);
     }
 
-    Vector2 ClampPositionToCameraBounds(Vector2 position)
-    {
-        if (mainCamera == null) return position;
-
-        // Offset to keep player sprite inside the camera view.
-        float offset = 0.3f; 
-
-        // Get the camera bounds.
-        Vector3 minBounds = mainCamera.ViewportToWorldPoint(new Vector3(0, 0, 0));
-        Vector3 maxBounds = mainCamera.ViewportToWorldPoint(new Vector3(1, 1, 0));
-
-        // Apply offset.
-        minBounds.x += offset;
-        minBounds.y += offset;
-        maxBounds.x -= offset;
-        maxBounds.y -= offset;
-
-        // Clamp position with offset.
-        position.x = Mathf.Clamp(position.x, minBounds.x, maxBounds.x);
-        position.y = Mathf.Clamp(position.y, minBounds.y, maxBounds.y);
-
-        return position;
-    }
 
     void GetInputVector(Vector2 inputDirection)
     {
