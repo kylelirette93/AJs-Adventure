@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.Rendering.UI;
 
 
 public class PlayerController : MonoBehaviour
@@ -27,10 +28,13 @@ public class PlayerController : MonoBehaviour
 
     // Jump settings for the player.
     [Header("Jump Settings")]
-    [SerializeField] float jumpForce = 50f;
+    [SerializeField] float jumpForce = 15f;
     [SerializeField] bool isJumping = false;
     [SerializeField] Transform groundCheck;
-
+    [SerializeField] float fallMultiplier = 2.5f;
+    [SerializeField] float lowJumpMultiplier = 2f;
+    [SerializeField] float maxJumpTime = 0.2f;
+    [SerializeField] float jumpTime = 0f;
 
     [Header("Dash Settings")]
     [SerializeField] bool isDashing = false;
@@ -57,7 +61,9 @@ public class PlayerController : MonoBehaviour
         // Subscribe to the events.
         Actions.MoveEvent += GetInputVector;
         Actions.DashEvent += Dash;
-        Actions.JumpEvent += Jump;
+        Actions.SpaceKeyPressed += OnSpaceKeyPressed;
+        Actions.SpaceKeyReleased += () => isJumping = false;
+
         Actions.ShiftKeyPressed += OnShiftKeyPressed;
         Actions.ShiftKeyReleased += OnShiftKeyReleased;
 
@@ -67,12 +73,29 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isGrounded)
+       // Handle movement in fixed update for physics calculations.
+       MovePlayer();
+       HandleJump();
+    }
+
+    private void HandleJump()
+    {
+        if (isJumping)
         {
-            // Handle movement in fixed update for physics calculations.
-            MovePlayer();
+            if (jumpTime < maxJumpTime)
+            {
+                rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce);
+                jumpTime += Time.fixedDeltaTime;
+            }
+            else
+            {
+                isJumping = false;
+                jumpTime = 0f;
+            }
         }
     }
+
+   
 
     private void Update()
     {
@@ -87,14 +110,22 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        if (rb2D.velocity.y < 0)
+        {
+            rb2D.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;  
+        }
+        else if (rb2D.velocity.y > 0 && !isJumping)
+        {
+            rb2D.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+        }
+        
+
+
         if (moveVector != Vector2.zero)
         {
             // Only handle flip if player is moving.
             Flip();
         }
-
-        animator.SetBool("IsRunning", isRunning);
-        animator.SetBool("IsMoving", moveVector != Vector2.zero);
 
         if (shiftHeld && moveVector != Vector2.zero && !isRunning)
         {
@@ -104,6 +135,16 @@ public class PlayerController : MonoBehaviour
         {
             StopRun();
         }
+
+        UpdateAnimator();
+    }
+
+    private void UpdateAnimator()
+    {
+        animator.SetBool("IsRunning", isRunning);
+        animator.SetBool("IsMoving", moveVector != Vector2.zero);
+        animator.SetBool("IsJumping", isJumping);      
+        animator.SetBool("IsGrounded", isGrounded); 
     }
 
     private void OnShiftKeyPressed()
@@ -117,6 +158,13 @@ public class PlayerController : MonoBehaviour
         shiftHeld = false;
         StopRun();
     }
+
+    private void OnSpaceKeyPressed()
+    {
+        Jump();
+    }
+
+   
 
     void StartRun()
     {
@@ -135,10 +183,13 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
-        if (isGrounded)
+        if (isGrounded && !isJumping)
         {
-            rb2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-            lastTimeJumped = Time.time;
+            // Perform a jump.
+            isJumping = true;
+            jumpTime = 0f;
+            rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce);
+            lastTimeJumped = Time.time;       
         }
     }
 
@@ -179,14 +230,14 @@ public class PlayerController : MonoBehaviour
 
     bool IsGrounded()
     {
-        if (lastTimeJumped + 0.1f > Time.time)
+        if (lastTimeJumped + 0.2f > Time.time)
             return false;
 
         
-        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, 1f, layersForRaycast);
+        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.8f, layersForRaycast);
         if (hit.collider != null)
         {
-            rb2D.velocity = new Vector2(rb2D.velocity.x, 0.0f);
+            isJumping = false;
             hitobject = hit.collider.gameObject; 
             return true;
         }
@@ -200,7 +251,7 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Vector3 direction = Vector2.down * 1f;
+        Vector3 direction = Vector2.down * 0.8f;
         Gizmos.DrawRay(groundCheck.position, direction);
     }
     void CreateDashTrail()
@@ -254,7 +305,7 @@ public class PlayerController : MonoBehaviour
             float currentSpeed = (runSpeed > 0) ? runSpeed : newSpeed;
             Vector2 newPosition = rb2D.position + moveVector * currentSpeed * Time.deltaTime;
             lastTimeMovedPlayer = Time.time;
-            rb2D.MovePosition(newPosition);
+            rb2D.velocity = new Vector2(moveVector.x * currentSpeed, rb2D.velocity.y);
         }
     }
 
@@ -271,6 +322,7 @@ public class PlayerController : MonoBehaviour
         {
             // No input, stay idle.
             moveVector = Vector2.zero;
+            rb2D.velocity = new Vector2(0, rb2D.velocity.y);
         }
     }
 

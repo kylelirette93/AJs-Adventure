@@ -70,7 +70,11 @@ public class InputManager : MonoBehaviour, GameInput.IPlayerActions
         if (context.performed)
         {
             Debug.Log("Jump performed");
-            Actions.JumpEvent?.Invoke();
+            Actions.SpaceKeyPressed?.Invoke();
+        }
+        if (context.canceled)
+        {
+            Actions.SpaceKeyReleased?.Invoke();
         }
     }
 }
@@ -81,6 +85,8 @@ public static class Actions
     public static Action<Vector2> MoveEvent;
     public static Action DashEvent;
     public static Action JumpEvent;
+    public static Action SpaceKeyPressed;
+    public static Action SpaceKeyReleased;
     public static Action ShiftKeyPressed;
     public static Action ShiftKeyReleased;
     public static Action StartInteractEvent;
