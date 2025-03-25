@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] bool isRunning = false;
     [SerializeField] bool wasRunning = false;
     [SerializeField] bool isGrounded = false;
-
+    public bool IsGrounded => isGrounded;
     // Jump settings for the player.
     [Header("Jump Settings")]
     [SerializeField] float jumpForce = 15f;
@@ -38,6 +38,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("Dash Settings")]
     [SerializeField] bool isDashing = false;
+    [SerializeField] bool canDash = true;
+    [SerializeField] float dashCooldownTime = 2f;
+    [SerializeField] float nextDashTime = 0f;
     [SerializeField] Vector2 dashDirection;
     [SerializeField] float dashSpeed = 20.0f;
     [SerializeField] float dashDuration = 0.2f;
@@ -99,14 +102,18 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        isGrounded = IsGrounded();
-
+        isGrounded = GroundCheck();
         if (dashTime > 0.0f)
         {
             dashTime -= Time.deltaTime;
             if (dashTime <= 0)
             {
+                lowJumpMultiplier = 2.5f;
                 newSpeed = moveSpeed;
+            }
+            else
+            {
+                lowJumpMultiplier = 25f;
             }
         }
 
@@ -119,8 +126,6 @@ public class PlayerController : MonoBehaviour
             rb2D.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
         }
         
-
-
         if (moveVector != Vector2.zero)
         {
             // Only handle flip if player is moving.
@@ -194,19 +199,27 @@ public class PlayerController : MonoBehaviour
     }
 
     void Dash()
-    {       
-        if (isRunning)
-        {
-            wasRunning = isRunning;
-            StopRun();
-        }
+    {
+        if (Time.time < nextDashTime) return;
+
         isDashing = true;
         dashTime = dashDuration;
-        dashDirection = lastMoveVector;
+        if (moveVector != Vector2.zero)
+        {
+            dashDirection = moveVector.normalized;
+        }
+        else
+        {
+            dashDirection = isFacingRight ? Vector2.right : Vector2.left;
+        }
+
         newSpeed = dashSpeed;
 
+
         // Dash movement, rotation, and scale.
-        transform.DOMove(transform.position + (Vector3)dashDirection, dashDuration / 2).SetEase(dashEase);
+        transform.DOMove(transform.position + new Vector3(dashDirection.x, 0, 0), dashDuration / 2).SetEase(dashEase);
+
+        rb2D.velocity = new Vector2(rb2D.velocity.x, 0);
         // Rotate the player in the direction of the dash, then return to original rotation.
         transform.DORotate(new Vector3(0, 0, transform.eulerAngles.z + (dashDirection.x > 0 ? -dashRotationAmount : dashRotationAmount)), dashDuration, RotateMode.FastBeyond360)
             .SetEase(rotationEase)
@@ -214,25 +227,21 @@ public class PlayerController : MonoBehaviour
             {
                 transform.DORotate(new Vector3(0, 0, 0), dashDuration * 0.7f).SetEase(rotationEase); // Return to original rotation smoothly after dash.
                 isDashing = false;
-                if (wasRunning)
-                {
-                    StartRun();
-                    wasRunning = false;
-                }
             });
         // Scale the player up and down during the dash.
         transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0.2f), dashDuration, 10, 1).SetEase(scaleEase);
 
         CreateDashTrail();
+
+        nextDashTime = Time.time + dashCooldownTime;
     }
 
     GameObject hitobject = null; 
 
-    bool IsGrounded()
+    bool GroundCheck()
     {
         if (lastTimeJumped + 0.2f > Time.time)
             return false;
-
         
         RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.8f, layersForRaycast);
         if (hit.collider != null)
@@ -294,15 +303,16 @@ public class PlayerController : MonoBehaviour
 
             trailRenderer.DOFade(0f, dashTrailFadeDuration)
                 .SetDelay(dashTrailDuration * segmentProgress)
-                .OnComplete(() => Destroy(trailSegment));
+                .OnComplete(() => Destroy(trailSegment));           
         }
+        
     }
 
     void MovePlayer()
     {
         if (moveVector != Vector2.zero)
         {
-            float currentSpeed = (runSpeed > 0) ? runSpeed : newSpeed;
+            float currentSpeed = (runSpeed > 0 && !isDashing) ? runSpeed : newSpeed;
             Vector2 newPosition = rb2D.position + moveVector * currentSpeed * Time.deltaTime;
             lastTimeMovedPlayer = Time.time;
             rb2D.velocity = new Vector2(moveVector.x * currentSpeed, rb2D.velocity.y);
