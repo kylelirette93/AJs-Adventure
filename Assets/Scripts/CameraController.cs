@@ -3,11 +3,10 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public Transform playerTransform;
-    float smoothTime = 0.25f;
-    const float followSpeed = 20f;
-    float fixedY = -1f;
-    Vector3 velocity = Vector3.zero;
+    [Header("Camera Controller Settings")]
+    [SerializeField] Transform playerTransform;
+    [SerializeField] float fixedY = 0f;
+
     Vector3 playerPosition;
 
     void Update()

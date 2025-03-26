@@ -38,7 +38,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("Dash Settings")]
     [SerializeField] bool isDashing = false;
-    [SerializeField] bool canDash = true;
     [SerializeField] float dashCooldownTime = 2f;
     [SerializeField] float nextDashTime = 0f;
     [SerializeField] Vector2 dashDirection;
@@ -71,6 +70,17 @@ public class PlayerController : MonoBehaviour
         Actions.ShiftKeyReleased += OnShiftKeyReleased;
 
         newSpeed = moveSpeed;
+    }
+
+    private void OnDisable()
+    {
+        Actions.MoveEvent -= GetInputVector;
+        Actions.DashEvent -= Dash;
+        Actions.SpaceKeyPressed -= OnSpaceKeyPressed;
+        Actions.SpaceKeyReleased -= () => isJumping = false;
+
+        Actions.ShiftKeyPressed -= OnShiftKeyPressed;
+        Actions.ShiftKeyReleased -= OnShiftKeyReleased;
     }
     float lastTimeMovedPlayer;
 
@@ -132,7 +142,7 @@ public class PlayerController : MonoBehaviour
             Flip();
         }
 
-        if (shiftHeld && moveVector != Vector2.zero && !isRunning)
+        if (shiftHeld && moveVector != Vector2.zero && !isRunning && isGrounded)
         {
             StartRun();
         }
@@ -155,7 +165,10 @@ public class PlayerController : MonoBehaviour
     private void OnShiftKeyPressed()
     {
         shiftHeld = true;
-        StartRun();
+        if (isGrounded && !isJumping)
+        {
+            StartRun();
+        }
     }
 
     private void OnShiftKeyReleased()
@@ -173,7 +186,7 @@ public class PlayerController : MonoBehaviour
 
     void StartRun()
     {
-        if (shiftHeld && moveVector != Vector2.zero)
+        if (shiftHeld && moveVector != Vector2.zero && isGrounded)
         {
             isRunning = true;
             runSpeed = moveSpeed * 2f;
