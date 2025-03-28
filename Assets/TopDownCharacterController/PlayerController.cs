@@ -30,11 +30,11 @@ public class PlayerController : MonoBehaviour
     [Header("Jump Settings")]
     [SerializeField] float jumpForce = 15f;
     [SerializeField] bool isJumping = false;
-    [SerializeField] Transform groundCheck;
     [SerializeField] float fallMultiplier = 2.5f;
     [SerializeField] float lowJumpMultiplier = 2f;
     [SerializeField] float maxJumpTime = 0.2f;
     [SerializeField] float jumpTime = 0f;
+    [SerializeField] float groundCheckDistance = 0.2f;
 
     [Header("Dash Settings")]
     [SerializeField] bool isDashing = false;
@@ -53,6 +53,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Ease scaleEase = Ease.OutBack;
 
     float lastTimeJumped = -10.0f;
+
+    public HealthSystem healthSystem = new HealthSystem(100);
+
     private void Awake()
     {
         // Get references.
@@ -74,8 +77,14 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
-        Actions.MoveEvent -= GetInputVector;
-        Actions.DashEvent -= Dash;
+        if (Actions.MoveEvent != null)
+        {
+            Actions.MoveEvent -= GetInputVector;
+        }
+        if (Actions.DashEvent != null)
+        {
+            Actions.DashEvent -= Dash;
+        }
         Actions.SpaceKeyPressed -= OnSpaceKeyPressed;
         Actions.SpaceKeyReleased -= () => isJumping = false;
 
@@ -205,6 +214,7 @@ public class PlayerController : MonoBehaviour
         {
             // Perform a jump.
             isJumping = true;
+            GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.jumpSFX);
             jumpTime = 0f;
             rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce);
             lastTimeJumped = Time.time;       
@@ -216,7 +226,9 @@ public class PlayerController : MonoBehaviour
         if (Time.time < nextDashTime) return;
 
         isDashing = true;
+        GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.dashSFX);
         dashTime = dashDuration;
+
         if (moveVector != Vector2.zero)
         {
             dashDirection = moveVector.normalized;
@@ -226,7 +238,7 @@ public class PlayerController : MonoBehaviour
             dashDirection = isFacingRight ? Vector2.right : Vector2.left;
         }
 
-        newSpeed = dashSpeed;
+        rb2D.velocity = dashDirection * dashSpeed;
 
 
         // Dash movement, rotation, and scale.
@@ -249,32 +261,31 @@ public class PlayerController : MonoBehaviour
         nextDashTime = Time.time + dashCooldownTime;
     }
 
-    GameObject hitobject = null; 
+    GameObject hitobject = null;
+
 
     bool GroundCheck()
     {
-        if (lastTimeJumped + 0.2f > Time.time)
-            return false;
-        
-        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.8f, layersForRaycast);
-        if (hit.collider != null)
+        // Get player's collider bounds.
+        Bounds colliderBounds = GetComponent<BoxCollider2D>().bounds;
+
+        // Calculate raycast positions.
+        Vector2 centerRaycast = new Vector2(colliderBounds.center.x, colliderBounds.min.y);
+        Vector2 leftRaycast = new Vector2(colliderBounds.min.x, colliderBounds.min.y);
+        Vector2 rightRaycast = new Vector2(colliderBounds.max.x, colliderBounds.min.y);
+
+        // Cast raycasts.
+        RaycastHit2D centerHit = Physics2D.Raycast(centerRaycast, Vector2.down, groundCheckDistance, layersForRaycast);
+        RaycastHit2D leftHit = Physics2D.Raycast(leftRaycast, Vector2.down, groundCheckDistance, layersForRaycast);
+        RaycastHit2D rightHit = Physics2D.Raycast(rightRaycast, Vector2.down, groundCheckDistance, layersForRaycast);
+
+        // Check if any raycast hit.
+        if (centerHit.collider != null || leftHit.collider != null || rightHit.collider != null)
         {
-            isJumping = false;
-            hitobject = hit.collider.gameObject; 
             return true;
         }
-        else
-        {
-            hitobject = null; 
-            return false;
-        }
-    }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Vector3 direction = Vector2.down * 0.8f;
-        Gizmos.DrawRay(groundCheck.position, direction);
+        return false;
     }
     void CreateDashTrail()
     {
@@ -286,8 +297,9 @@ public class PlayerController : MonoBehaviour
             // Add a sprite renderer to the trail segment and copy the player's sprite.
             SpriteRenderer trailRenderer = trailSegment.AddComponent<SpriteRenderer>();
             SpriteRenderer playerRenderer = GetComponentInChildren<SpriteRenderer>();
-            trailRenderer.sprite = playerRenderer.sprite; 
+            trailRenderer.sprite = playerRenderer.sprite;
 
+            trailRenderer.sortingLayerName = "Player";
             // Set the segment progress based on the current iteration.
             float segmentProgress = (float)i / dashTrailSegments;
             // Set the trail segment's sorting order to be behind the player.
@@ -323,13 +335,19 @@ public class PlayerController : MonoBehaviour
 
     void MovePlayer()
     {
-        if (moveVector != Vector2.zero)
+        if (!isDashing)
         {
-            float currentSpeed = (runSpeed > 0 && !isDashing) ? runSpeed : newSpeed;
-            Vector2 newPosition = rb2D.position + moveVector * currentSpeed * Time.deltaTime;
-            lastTimeMovedPlayer = Time.time;
-            rb2D.velocity = new Vector2(moveVector.x * currentSpeed, rb2D.velocity.y);
+            if (moveVector != Vector2.zero)
+            {
+                float currentSpeed = (runSpeed > 0) ? runSpeed : newSpeed;
+                rb2D.velocity = new Vector2(moveVector.x * currentSpeed, rb2D.velocity.y);
+            }
+            else
+            {
+                rb2D.velocity = new Vector2(0, rb2D.velocity.y);
+            }
         }
+
     }
 
 

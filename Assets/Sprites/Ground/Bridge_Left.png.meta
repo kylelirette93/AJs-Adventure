@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1ba5bd29ca6caef438567187183cd84f
+guid: b54bb244787dc494bb1a609ec8caa7ed
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Cheese_0
+      name: Bridge_Left_0
       rect:
         serializedVersion: 2
         x: 0
@@ -124,8 +124,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 77a9eb29a0dcebb459ca51b9ea55ed01
-      internalID: -1841480938
+      spriteID: 1b0bac14852e52d4e82579b9c76836a9
+      internalID: -149108769
       vertices: []
       indices: 
       edges: []
@@ -141,7 +141,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Cheese_0: -1841480938
+      Bridge_Left_0: -149108769
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

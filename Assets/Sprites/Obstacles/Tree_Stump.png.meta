@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1ba5bd29ca6caef438567187183cd84f
+guid: d9531139b080dcb4c8cb186cbc6c0ac4
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -34,7 +34,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Cheese_0
+      name: Tree_Stump_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 16
-        height: 16
+        width: 32
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,8 +124,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 77a9eb29a0dcebb459ca51b9ea55ed01
-      internalID: -1841480938
+      spriteID: b9646d8c028c7434e874200660e28c2d
+      internalID: -304812833
       vertices: []
       indices: 
       edges: []
@@ -141,7 +141,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Cheese_0: -1841480938
+      Tree_Stump_0: -304812833
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

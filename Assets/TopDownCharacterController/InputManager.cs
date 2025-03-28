@@ -32,12 +32,12 @@ public class InputManager : MonoBehaviour, GameInput.IPlayerActions
     {
         if (context.started)
         {
-            Debug.Log("Should be running.");
+            //Debug.Log("Should be running.");
             Actions.ShiftKeyPressed?.Invoke();
         }
         if (context.canceled)
         {
-            Debug.Log("Should stop running.");
+            //Debug.Log("Should stop running.");
             Actions.ShiftKeyReleased?.Invoke();
         }
     }
@@ -69,7 +69,7 @@ public class InputManager : MonoBehaviour, GameInput.IPlayerActions
     {
         if (context.performed)
         {
-            Debug.Log("Jump performed");
+            //Debug.Log("Jump performed");
             Actions.SpaceKeyPressed?.Invoke();
         }
         if (context.canceled)

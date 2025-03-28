@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1ba5bd29ca6caef438567187183cd84f
+guid: f2b9c70cc714d544b9c5cc6fd7289d9c
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -34,7 +34,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Cheese_0
+      name: Mountains_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 16
-        height: 16
+        width: 400
+        height: 75
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,8 +124,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 77a9eb29a0dcebb459ca51b9ea55ed01
-      internalID: -1841480938
+      spriteID: 23700a1fd5598fd47b5762d1af3f1f27
+      internalID: 1697398742
       vertices: []
       indices: 
       edges: []
@@ -141,7 +141,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Cheese_0: -1841480938
+      Mountains_0: 1697398742
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
