@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviour
     float lastTimeJumped = -10.0f;
 
     public HealthSystem healthSystem = new HealthSystem(100);
+    public ParticleSystem dustParticles;
 
     private void Awake()
     {
@@ -375,11 +376,19 @@ public class PlayerController : MonoBehaviour
         {
             isFacingRight = true;
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+            if (isGrounded)
+            {
+                dustParticles.Play();
+            }
         }
         else if (moveVector.x < 0 && isFacingRight)
         {
             isFacingRight = false;
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+            if (isGrounded)
+            {
+                dustParticles.Play();
+            }
         }
     }
 }

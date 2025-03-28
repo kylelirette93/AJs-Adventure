@@ -2,7 +2,8 @@ using UnityEngine;
 public class PlayerCollision : MonoBehaviour
 {
     new Rigidbody2D rigidbody2D;
-    float bounceForce = 14f;
+    
+    [SerializeField] float bounceForce = 14f;
 
     private void Start()
     {
