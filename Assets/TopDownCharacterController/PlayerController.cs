@@ -2,6 +2,7 @@ using UnityEngine;
 using DG.Tweening;
 using TMPro;
 using UnityEngine.Rendering.UI;
+using System.Collections;
 
 
 public class PlayerController : MonoBehaviour
@@ -37,13 +38,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float groundCheckDistance = 0.2f;
 
     [Header("Dash Settings")]
+    private float customDashTimer = 0f;
     [SerializeField] bool isDashing = false;
     [SerializeField] float dashCooldownTime = 2f;
     [SerializeField] float nextDashTime = 0f;
     [SerializeField] Vector2 dashDirection;
     [SerializeField] float dashSpeed = 20.0f;
     [SerializeField] float dashDuration = 0.2f;
-    [SerializeField] float dashTime = 0f;
     [SerializeField] float dashTrailDuration = 0.2f; 
     [SerializeField] float dashTrailFadeDuration = 0.1f; 
     [SerializeField] int dashTrailSegments = 10; 
@@ -57,8 +58,11 @@ public class PlayerController : MonoBehaviour
     public HealthSystem healthSystem = new HealthSystem(100);
     public ParticleSystem dustParticles;
 
+    Vector2 startingPosition;
+
     private void Awake()
     {
+        startingPosition = transform.position;
         // Get references.
         rb2D = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
@@ -123,10 +127,11 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         isGrounded = GroundCheck();
-        if (dashTime > 0.0f)
+
+        if (customDashTimer > 0.0f)
         {
-            dashTime -= Time.deltaTime;
-            if (dashTime <= 0)
+            customDashTimer -= Time.unscaledDeltaTime; // Use unscaledDeltaTime
+            if (customDashTimer <= 0)
             {
                 lowJumpMultiplier = 2.5f;
                 newSpeed = moveSpeed;
@@ -162,6 +167,14 @@ public class PlayerController : MonoBehaviour
         }
 
         UpdateAnimator();
+
+        if (transform.position.y <= -6f)
+        {
+            GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.deathSFX);
+            Camera camera = Camera.main;
+            camera.transform.DOMove(new Vector3(startingPosition.x, startingPosition.y + 5f, -10f), 0.7f).SetEase(Ease.OutExpo);
+            transform.DOMove(startingPosition, 0.7f).SetEase(Ease.OutExpo);
+        }
     }
 
     private void UpdateAnimator()
@@ -228,7 +241,7 @@ public class PlayerController : MonoBehaviour
 
         isDashing = true;
         GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.dashSFX);
-        dashTime = dashDuration;
+        customDashTimer = dashDuration;
 
         if (moveVector != Vector2.zero)
         {

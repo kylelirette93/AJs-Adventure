@@ -6,6 +6,7 @@ public class Cheese : MonoBehaviour
 {
     private SpriteRenderer spriteRenderer;
     private ParticleSystem particleSystem;
+    bool isCollected = false;
 
     private void Start()
     {
@@ -16,7 +17,12 @@ public class Cheese : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            GameManager.instance.scoreManager.AddCheese();
+            if (!isCollected)
+            {
+                GameManager.instance.scoreManager.AddCheese();
+                GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.eatSFX);
+                isCollected = true;
+            }         
             Explode();
         }
     }

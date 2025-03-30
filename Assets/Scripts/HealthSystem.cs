@@ -6,6 +6,8 @@ public class HealthSystem
 {
     private int maxHealth;
     private int currentHealth;
+    public int Lives { get { return lives; } set { lives = value; } }
+    private int lives;
     public HealthSystem(int maxHealth)
     {
         this.maxHealth = maxHealth;

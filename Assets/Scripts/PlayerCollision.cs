@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 public class PlayerCollision : MonoBehaviour
 {
@@ -14,8 +15,22 @@ public class PlayerCollision : MonoBehaviour
         if (other.gameObject.tag == "Headcheck")
         {
             BoxCollider2D collisionObjectCollider = other.gameObject.GetComponentInParent<BoxCollider2D>();
+            Enemy enemy = other.gameObject.GetComponentInParent<Enemy>();
+            enemy.Die();
             if (collisionObjectCollider != null)
             {
+                Animator enemyAnimator = other.gameObject.GetComponentInParent<Animator>();
+                if (enemyAnimator != null)
+                {
+                    Destroy(enemyAnimator);
+                }
+
+                Transform parentTransform = other.gameObject.transform.parent;
+                if (parentTransform != null)
+                {
+                    parentTransform.DORotate(new Vector3(0, 0, 180), 0.5f);
+                }
+
                 collisionObjectCollider.enabled = false;
             }
             GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.bounceSFX);

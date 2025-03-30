@@ -10,6 +10,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip bounceSFX;
     public AudioClip dashSFX;
     public AudioClip jumpSFX;
+    public AudioClip eatSFX;
+    public AudioClip deathSFX;
 
     // Music files.
     public AudioClip level1Music;

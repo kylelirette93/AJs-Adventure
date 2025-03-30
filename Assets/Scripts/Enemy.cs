@@ -16,6 +16,7 @@ public class Enemy : MonoBehaviour
     protected Vector2 moveDirection;
     protected bool movingLeft = true;
     public HealthSystem healthSystem = new HealthSystem(100);
+    bool canMove = true;
 
     protected void Start()
     {
@@ -26,7 +27,15 @@ public class Enemy : MonoBehaviour
 
     public virtual void Update()
     {
-        MoveEnemy();
+        if (canMove)
+        {
+            MoveEnemy();
+        }
+       
+        if (transform.position.y < -10f)
+        {
+            Destroy(gameObject);
+        }
     }
 
     public virtual void MoveEnemy()
@@ -44,6 +53,11 @@ public class Enemy : MonoBehaviour
         float direction = movingLeft ? -1 : 1;
         moveDirection = new Vector2(direction, 0);
         rigidbody2D.velocity = moveDirection * movementSpeed;        
+    }
+
+    public void Die()
+    {
+        canMove = false;
     }
 
     protected void Flip()

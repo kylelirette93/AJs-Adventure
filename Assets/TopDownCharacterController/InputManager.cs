@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour, GameInput.IPlayerActions
 {
-    GameInput gameInput;
+    public GameInput gameInput;
     void Start()
     {
         // Initialize the instance of game input.

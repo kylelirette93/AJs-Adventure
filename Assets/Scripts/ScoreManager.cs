@@ -11,6 +11,6 @@ public class ScoreManager : MonoBehaviour
     public void AddCheese()
     {
         cheeseCollected++;
-        cheeseCollectedText.text = "cheese " + cheeseCollected.ToString();
+        cheeseCollectedText.text = "cheese: " + cheeseCollected.ToString();
     }
 }
