@@ -157,7 +157,7 @@ public class PlayerController : MonoBehaviour
             Flip();
         }
 
-        if (shiftHeld && moveVector != Vector2.zero && !isRunning && isGrounded)
+        if (shiftHeld && moveVector != Vector2.zero && !isRunning)
         {
             StartRun();
         }
@@ -179,7 +179,7 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateAnimator()
     {
-        animator.SetBool("IsRunning", isRunning);
+        animator.SetBool("IsRunning", isRunning && !isJumping);
         animator.SetBool("IsMoving", moveVector != Vector2.zero);
         animator.SetBool("IsJumping", isJumping);      
         animator.SetBool("IsGrounded", isGrounded); 
@@ -209,7 +209,7 @@ public class PlayerController : MonoBehaviour
 
     void StartRun()
     {
-        if (shiftHeld && moveVector != Vector2.zero && isGrounded)
+        if (shiftHeld && moveVector != Vector2.zero)
         {
             isRunning = true;
             runSpeed = moveSpeed * 2f;
@@ -353,7 +353,7 @@ public class PlayerController : MonoBehaviour
         {
             if (moveVector != Vector2.zero)
             {
-                float currentSpeed = (runSpeed > 0) ? runSpeed : newSpeed;
+                float currentSpeed = (isRunning && runSpeed > 0) ? runSpeed : newSpeed;
                 rb2D.velocity = new Vector2(moveVector.x * currentSpeed, rb2D.velocity.y);
             }
             else

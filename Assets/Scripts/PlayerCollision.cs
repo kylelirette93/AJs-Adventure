@@ -16,6 +16,7 @@ public class PlayerCollision : MonoBehaviour
         {
             BoxCollider2D collisionObjectCollider = other.gameObject.GetComponentInParent<BoxCollider2D>();
             Enemy enemy = other.gameObject.GetComponentInParent<Enemy>();
+            Rigidbody2D enemyRb = other.gameObject.GetComponentInParent<Rigidbody2D>();
             enemy.Die();
             if (collisionObjectCollider != null)
             {
@@ -32,6 +33,11 @@ public class PlayerCollision : MonoBehaviour
                 }
 
                 collisionObjectCollider.enabled = false;
+
+                if (enemyRb != null)
+                {
+                    enemyRb.constraints = RigidbodyConstraints2D.None;
+                }
             }
             GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.bounceSFX);
             rigidbody2D.velocity = Vector2.up * bounceForce;

@@ -34,7 +34,7 @@ public class DashInteraction : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.JoystickButton5) && isFrozen)
+        if (isFrozen && (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.JoystickButton5)))
         {
             UnfreezeTime();
         }
