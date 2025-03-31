@@ -14,6 +14,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip deathSFX;
 
     // Music files.
+    public AudioClip mainMenuMusic;
     public AudioClip level1Music;
 
     public void PlayOneShot(AudioClip clip)
