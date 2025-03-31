@@ -83,7 +83,7 @@ GameObject:
   - component: {fileID: 5783599586619752410}
   m_Layer: 0
   m_Name: Hedgehog
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -143,7 +143,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1027267831
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 1937986758, guid: b517b455b1e90294585fdf8fde6f53d8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

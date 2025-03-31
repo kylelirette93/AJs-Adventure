@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
 {
     [Header("Base Enemy Settings")]
     [SerializeField] protected float movementSpeed;
+    public Vector2 StartPosition { get { return startPosition; } }
     [SerializeField] protected Vector2 startPosition;
     [SerializeField] protected float travelDistance;
 
@@ -17,11 +18,15 @@ public class Enemy : MonoBehaviour
     protected bool movingLeft = true;
     public HealthSystem healthSystem = new HealthSystem(100);
     bool canMove = true;
+    private Object enemyRef;
+    bool isDead = false;
+    BoxCollider2D collider;
 
     protected void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         rigidbody2D = GetComponent<Rigidbody2D>();
+        collider = GetComponent<BoxCollider2D>();
         startPosition = transform.position;
     }
 
@@ -32,9 +37,9 @@ public class Enemy : MonoBehaviour
             MoveEnemy();
         }
        
-        if (transform.position.y < -10f)
+        if (transform.position.y < -10f && !isDead)
         {
-            Destroy(gameObject);
+            KillSelf();
         }
     }
 
@@ -53,6 +58,25 @@ public class Enemy : MonoBehaviour
         float direction = movingLeft ? -1 : 1;
         moveDirection = new Vector2(direction, 0);
         rigidbody2D.velocity = moveDirection * movementSpeed;        
+    }
+
+    void KillSelf()
+    {
+        isDead = true;
+        gameObject.SetActive(false);
+
+        Invoke("Respawn", 5f);
+    }
+
+    private void Respawn()
+    {
+        collider.enabled = true;
+        rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionY;
+        canMove = true;
+        isDead = false;
+        gameObject.transform.position = startPosition;
+        gameObject.transform.rotation = Quaternion.identity;
+        gameObject.SetActive(true);
     }
 
     public void Die()

@@ -43,7 +43,7 @@ public class DashInteraction : MonoBehaviour
     void UnfreezeTime()
     {
         Time.timeScale = 0.1f;
-        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1, 3.0f).SetEase(Ease.OutCubic).SetUpdate(true);
+        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1, 2.0f).SetEase(Ease.OutCubic).SetUpdate(true);
         dashText.enabled = false;
 
         if (audioManager != null)

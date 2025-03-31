@@ -20,12 +20,6 @@ public class PlayerCollision : MonoBehaviour
             enemy.Die();
             if (collisionObjectCollider != null)
             {
-                Animator enemyAnimator = other.gameObject.GetComponentInParent<Animator>();
-                if (enemyAnimator != null)
-                {
-                    Destroy(enemyAnimator);
-                }
-
                 Transform parentTransform = other.gameObject.transform.parent;
                 if (parentTransform != null)
                 {

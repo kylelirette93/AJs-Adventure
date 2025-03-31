@@ -88,7 +88,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3038d0814c5107845a57439e86c429e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cheeseCollectedText: {fileID: 0}
+  cheeseCollectedText: {fileID: 1974057073976419075}
 --- !u!1 &2831825151845613562
 GameObject:
   m_ObjectHideFlags: 0
@@ -334,7 +334,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: c794fec314f99cd4fa433c54dd29afd3, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.473
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -435,6 +435,8 @@ MonoBehaviour:
   bounceSFX: {fileID: 8300000, guid: 54e9713ba15434f41964a998831f7fa7, type: 3}
   dashSFX: {fileID: 8300000, guid: 7a082ebfe2dead24482dde1e190d41a0, type: 3}
   jumpSFX: {fileID: 8300000, guid: e09f4bef5202290419a8dc7caddaff97, type: 3}
+  eatSFX: {fileID: 8300000, guid: 2fe607fc5250de8439302241ed34e41b, type: 3}
+  deathSFX: {fileID: 8300000, guid: 2b947f225d466d14bb51bbd053a089af, type: 3}
   level1Music: {fileID: 8300000, guid: c794fec314f99cd4fa433c54dd29afd3, type: 3}
 --- !u!82 &992765430576323322
 AudioSource:
@@ -597,17 +599,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: cheese
+  m_text: 'cheese: '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a9d1980795f40494c937a1b9c144f35d, type: 2}
-  m_sharedMaterial: {fileID: 4412933611605236084, guid: a9d1980795f40494c937a1b9c144f35d, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: acc2ebefb09e1f34f97d572629e4e751, type: 2}
+  m_sharedMaterial: {fileID: 1034261855955728714, guid: acc2ebefb09e1f34f97d572629e4e751, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4285119972
+  m_fontColor: {r: 0.8941177, g: 0.7411765, b: 0.41176474, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -624,13 +626,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 48
+  m_fontSizeBase: 48
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 33
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -893,6 +895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 294029cad42cb044e8a039dec45a51ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameStateManager: {fileID: 0}
-  uiManager: {fileID: 0}
+  gameStateManager: {fileID: 1664913980299611028}
+  uiManager: {fileID: 2426551549912401171}
   audioManager: {fileID: 1325848143465573804}
+  scoreManager: {fileID: 4027702231665141429}
