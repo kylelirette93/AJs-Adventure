@@ -1,17 +1,19 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Cheese : MonoBehaviour
 {
     private SpriteRenderer spriteRenderer;
     private ParticleSystem particleSystem;
+    private BoxCollider2D boxCollider;
+    public bool IsCollected { get { return isCollected; } set { isCollected = value; } }
     bool isCollected = false;
 
     private void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         particleSystem = GetComponent<ParticleSystem>();
+        boxCollider = GetComponent<BoxCollider2D>();
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -31,6 +33,7 @@ public class Cheese : MonoBehaviour
     {
         particleSystem.Play();
         spriteRenderer.enabled = false; // Hide the sprite
+        boxCollider.enabled = false;
 
         StartCoroutine(WaitForParticleSystemToFinish());
     }
@@ -41,12 +44,11 @@ public class Cheese : MonoBehaviour
         {
             yield return null;
         }
-
-        DestroyCheese();
     }
 
-    private void DestroyCheese()
+    public void EnableCheese()
     {
-        Destroy(gameObject);
+        spriteRenderer.enabled = true;
+        boxCollider.enabled = true;
     }
 }

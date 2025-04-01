@@ -1,8 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Rendering.UI;
-using System.Collections;
 
 
 public class PlayerController : MonoBehaviour
@@ -38,20 +37,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float groundCheckDistance = 0.2f;
 
     [Header("Dash Settings")]
-    private float customDashTimer = 0f;
     [SerializeField] bool isDashing = false;
-    [SerializeField] float dashCooldownTime = 2f;
-    [SerializeField] float nextDashTime = 0f;
     [SerializeField] Vector2 dashDirection;
     [SerializeField] float dashSpeed = 20.0f;
     [SerializeField] float dashDuration = 0.2f;
-    [SerializeField] float dashTrailDuration = 0.2f; 
-    [SerializeField] float dashTrailFadeDuration = 0.1f; 
-    [SerializeField] int dashTrailSegments = 10; 
-    [SerializeField] float dashRotationAmount = 45f; 
-    [SerializeField] Ease dashEase = Ease.OutQuad; 
-    [SerializeField] Ease rotationEase = Ease.OutBack; 
+    [SerializeField] float dashTrailDuration = 0.2f;
+    [SerializeField] float dashTrailFadeDuration = 0.1f;
+    [SerializeField] int dashTrailSegments = 10;
+    [SerializeField] float dashRotationAmount = 45f;
+    [SerializeField] Ease dashEase = Ease.OutQuad;
+    [SerializeField] Ease rotationEase = Ease.OutBack;
     [SerializeField] Ease scaleEase = Ease.OutBack;
+    private float customDashTimer = 0f;
+
+    [Header("Stamina Settings")]
+    public float maxEnergy = 100f;
+    public float currentEnergy;
+    public float energyCost = 30f;
+    public float energyRegenRate = 10f;
+    public Image energyBar;
+    public TextMeshProUGUI energyText;
 
     float lastTimeJumped = -10.0f;
 
@@ -62,6 +67,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        currentEnergy = maxEnergy;
         startingPosition = transform.position;
         // Get references.
         rb2D = GetComponent<Rigidbody2D>();
@@ -128,6 +134,9 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = GroundCheck();
 
+        RegenerateStamina();
+        UpdateStaminaUI();
+
         if (customDashTimer > 0.0f)
         {
             customDashTimer -= Time.unscaledDeltaTime; // Use unscaledDeltaTime
@@ -171,9 +180,7 @@ public class PlayerController : MonoBehaviour
         if (transform.position.y <= -6f)
         {
             GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.deathSFX);
-            Camera camera = Camera.main;
-            camera.transform.DOMove(new Vector3(startingPosition.x, startingPosition.y + 5f, -10f), 0.7f).SetEase(Ease.OutExpo);
-            transform.DOMove(startingPosition, 0.7f).SetEase(Ease.OutExpo);
+            ResetPlayer();
         }
     }
 
@@ -205,8 +212,6 @@ public class PlayerController : MonoBehaviour
         Jump();
     }
 
-   
-
     void StartRun()
     {
         if (shiftHeld && moveVector != Vector2.zero)
@@ -216,12 +221,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void ResetPlayer()
+    {
+        Camera camera = Camera.main;
+        camera.transform.DOMove(new Vector3(startingPosition.x, startingPosition.y + 5f, -10f), 0.7f).SetEase(Ease.OutExpo);
+        transform.DOMove(startingPosition, 0.7f).SetEase(Ease.OutExpo);
+        foreach (GameObject cheese in GameObject.FindGameObjectsWithTag("Cheese"))
+        {
+            GameManager.instance.scoreManager.Reset();
+            cheese.GetComponent<Cheese>().IsCollected = false;
+            cheese.GetComponent<Cheese>().EnableCheese();
+        }
+    }
+
     void StopRun()
     {
         isRunning = false;
         runSpeed = 0f;
     }
-
     void Jump()
     {
         if (isGrounded && !isJumping)
@@ -237,11 +254,14 @@ public class PlayerController : MonoBehaviour
 
     void Dash()
     {
-        if (Time.time < nextDashTime) return;
+        if (currentEnergy < energyCost) return;
 
         isDashing = true;
         GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.dashSFX);
         customDashTimer = dashDuration;
+
+        currentEnergy -= energyCost;
+        UpdateStaminaUI();
 
         if (moveVector != Vector2.zero)
         {
@@ -271,12 +291,35 @@ public class PlayerController : MonoBehaviour
         transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0.2f), dashDuration, 10, 1).SetEase(scaleEase);
 
         CreateDashTrail();
-
-        nextDashTime = Time.time + dashCooldownTime;
     }
 
     GameObject hitobject = null;
 
+
+    void RegenerateStamina()
+    {
+        if (currentEnergy < maxEnergy && !isDashing)
+        {
+            currentEnergy += energyRegenRate * Time.deltaTime;
+            currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
+        }
+    }
+
+    void UpdateStaminaUI()
+    {
+        if (energyBar != null && energyText != null)
+        {
+            energyBar.fillAmount = currentEnergy / maxEnergy;
+            energyText.text = "energy";
+
+            float energyPercentage = currentEnergy / maxEnergy;
+            Color startColor = Color.red;
+            Color endColor = Color.green;
+            Color currentColor = Color.Lerp(startColor, endColor, energyPercentage);
+
+            energyText.DOColor(currentColor, 0.2f);
+        }
+    }
 
     bool GroundCheck()
     {
@@ -343,8 +386,7 @@ public class PlayerController : MonoBehaviour
             trailRenderer.DOFade(0f, dashTrailFadeDuration)
                 .SetDelay(dashTrailDuration * segmentProgress)
                 .OnComplete(() => Destroy(trailSegment));           
-        }
-        
+        }        
     }
 
     void MovePlayer()
@@ -361,9 +403,7 @@ public class PlayerController : MonoBehaviour
                 rb2D.velocity = new Vector2(0, rb2D.velocity.y);
             }
         }
-
     }
-
 
     void GetInputVector(Vector2 inputDirection)
     {

@@ -8,8 +8,7 @@ public class GameManager : MonoBehaviour
     public GameStateManager gameStateManager;
     public UIManager uiManager;
     public AudioManager audioManager;
-    public ScoreManager scoreManager;
-    
+    public ScoreManager scoreManager;   
 
     private void Awake()
     {

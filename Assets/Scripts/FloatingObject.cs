@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FloatingObject : MonoBehaviour
 {
-    float floatHeight = 0.3f;
+    float floatHeight = 0.5f;
     Vector3 originalPosition;
 
     private void Start()
@@ -14,7 +14,10 @@ public class FloatingObject : MonoBehaviour
 
     private void Update()
     {
-        Mathf.Sign(Mathf.Sin(Time.time));
-        transform.position = new Vector3(originalPosition.x, originalPosition.y * floatHeight * Mathf.Sin(Time.time), 0);
+        transform.position = new Vector3(
+            originalPosition.x,
+            originalPosition.y + (floatHeight * Mathf.Sin(Time.time)), // Corrected line
+            originalPosition.z // Ensure to keep the original z position
+        );
     }
 }

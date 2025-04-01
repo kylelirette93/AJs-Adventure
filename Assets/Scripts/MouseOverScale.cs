@@ -21,6 +21,6 @@ public class MouseOverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void OnPointerExit(PointerEventData eventData)
     {
         // Reset the scale when the mouse exits the object.
-        transform.DOScale(transform.localScale - scaleIncrease, 0.3f);
+        transform.DOScale(originalScale, 0.3f);
     }
 }
