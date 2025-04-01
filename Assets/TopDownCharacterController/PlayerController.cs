@@ -67,6 +67,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        energyBar.enabled = true;
         currentEnergy = maxEnergy;
         startingPosition = transform.position;
         // Get references.
