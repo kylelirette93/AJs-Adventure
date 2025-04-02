@@ -5,59 +5,116 @@ using UnityEngine;
 public class GameStateManager : MonoBehaviour
 {
     public Vector2 playerPosition;
-
     float gameTimer;
     public bool IsGameOver = false;
     private bool isTimerRunning = false;
     public PlayerController player;
+    public InputManager inputManager;
 
     public GameState CurrentState { get; private set; } = GameState.Menu;
 
     public enum GameState
     {
         Menu,
+        Controls,
         Difficulty,
         Gameplay,
         GameWin,
         GameOver
     }
 
+    private void Start()
+    {
+        if (!GameManager.instance.audioManager.IsPlaying)
+        {
+            GameManager.instance.audioManager.PlayMusic(GameManager.instance.audioManager.mainMenuMusic);
+        }
+    }
+
     public void ChangeState(GameState newState)
     {
-        CurrentState = newState;
-        if (newState == GameState.Gameplay)
+        if (CurrentState != newState)
         {
-            isTimerRunning = true;
-            GameManager.instance.audioManager.PlayMusic(GameManager.instance.audioManager.level1Music);
+            ExitState(CurrentState);
+            CurrentState = newState;
+            EnterState(CurrentState);
         }
-        else
+    }
+
+    private void EnterState(GameState state)
+    {
+        switch (state)
         {
-            isTimerRunning = false;
+            case GameState.Menu:
+                GameManager.instance.uiManager.EnableMainMenuUI();
+                if (!GameManager.instance.audioManager.IsPlaying)
+                GameManager.instance.audioManager.PlayMusic(GameManager.instance.audioManager.mainMenuMusic);
+                inputManager.gameInput.Disable();
+                break;
+
+            case GameState.Controls:
+                GameManager.instance.uiManager.EnableControlsUI();
+                inputManager.gameInput.Disable();
+                break;
+
+            case GameState.Difficulty:
+                GameManager.instance.uiManager.EnableDifficultyUI();
+                inputManager.gameInput.Disable();
+                break;
+
+            case GameState.Gameplay:
+                GameManager.instance.uiManager.EnableGameplayUI();
+                GameManager.instance.audioManager.PlayMusic(GameManager.instance.audioManager.level1Music);
+                inputManager.gameInput.Enable();
+                isTimerRunning = true;
+                break;
+
+            case GameState.GameWin:
+                player.ResetPlayer();
+                GameManager.instance.uiManager.EnableGameWinUI();
+                GameManager.instance.audioManager.StopMusic();
+                inputManager.gameInput.Disable();
+                break;
+
+            case GameState.GameOver:
+                player.ResetPlayer();
+                GameManager.instance.uiManager.EnableGameOverUI();
+                GameManager.instance.audioManager.StopMusic();
+                inputManager.gameInput.Disable();
+                break;
+        }
+    }
+
+    private void ExitState(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.Gameplay:
+                isTimerRunning = false;
+                break;
+            case GameState.Menu:
+                GameManager.instance.uiManager.DisableAllMenuUI();
+                break;
+            case GameState.Controls:
+                GameManager.instance.uiManager.DisableAllMenuUI();
+                break;
+            case GameState.Difficulty:
+                GameManager.instance.uiManager.DisableAllMenuUI();
+                break;
+            case GameState.GameWin:
+                GameManager.instance.uiManager.DisableAllMenuUI();
+                break;
+            case GameState.GameOver:
+                GameManager.instance.uiManager.DisableAllMenuUI();
+                break;
         }
     }
 
     public void Update()
     {
-        switch (CurrentState) 
+        if (CurrentState == GameState.Gameplay)
         {
-            case GameState.Menu:
-               GameManager.instance.uiManager.EnableMainMenuUI();
-               break;
-            case GameState.Difficulty:
-                GameManager.instance.uiManager.EnableDifficultyUI();
-                break;
-            case GameState.Gameplay:
-                GameManager.instance.uiManager.EnableGameplayUI();
-                StartGameTimer();
-                break;
-            case GameState.GameWin:
-                player.ResetPlayer();
-                GameManager.instance.uiManager.EnableGameWinUI();
-                break;
-            case GameState.GameOver:
-                player.ResetPlayer();
-                GameManager.instance.uiManager.EnableGameOverUI();
-                break;
+            StartGameTimer();
         }
     }
 
@@ -106,6 +163,10 @@ public class GameStateManager : MonoBehaviour
         Application.Quit();
     }
 
+    public void Controls()
+    {
+        ChangeState(GameState.Controls);
+    }
     public void WinGame()
     {
         ChangeState(GameState.GameWin);

@@ -12,10 +12,15 @@ public class MouseOverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         originalScale = transform.localScale; 
     }
 
+    private void OnDisable()
+    {
+        transform.localScale = originalScale;
+    }
     public void OnPointerEnter(PointerEventData eventData)
     {
         // Increase the scale when the mouse enters the object.
-        transform.DOScale(transform.localScale + scaleIncrease, 0.3f);
+        transform.DOScale(originalScale + scaleIncrease, 0.3f);
+        GameManager.instance.audioManager.PlayOneShot(GameManager.instance.audioManager.popSFX);
     }
 
     public void OnPointerExit(PointerEventData eventData)

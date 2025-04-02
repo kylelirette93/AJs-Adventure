@@ -11,10 +11,13 @@ public class AudioManager : MonoBehaviour
     public AudioClip jumpSFX;
     public AudioClip eatSFX;
     public AudioClip deathSFX;
+    public AudioClip popSFX;
 
     // Music files.
     public AudioClip mainMenuMusic;
     public AudioClip level1Music;
+    public bool IsPlaying { get { return isPlaying; } }
+    bool isPlaying = false;
 
     public void PlayOneShot(AudioClip clip)
     {
@@ -23,8 +26,14 @@ public class AudioManager : MonoBehaviour
 
     public void PlayMusic(AudioClip clip)
     {
+        isPlaying = true;
         musicSource.clip = clip;
         musicSource.loop = true;
         musicSource.Play();
+    }
+    public void StopMusic()
+    {
+        isPlaying = false;
+        musicSource.Stop();
     }
 }

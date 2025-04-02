@@ -17,11 +17,11 @@ public class TimerUI : MonoBehaviour
         }
         else if (GameManager.instance.gameStateManager.CurrentState == GameStateManager.GameState.GameWin)
         {
-            remainingText.text = "You made it home in " + gameTime.ToString("F2") + " seconds.";
+            remainingText.text = "You made it home in with " + gameTime.ToString("F2") + " seconds remaining";
         }
         else if (GameManager.instance.gameStateManager.CurrentState == GameStateManager.GameState.GameOver)
         {
-            remainingText.text = "You ran out of time! You were " + gameTime.ToString("F2") + " seconds away from home.";
+            remainingText.text = "You ran out of time!";
         }
         else if (GameManager.instance.gameStateManager.CurrentState == GameStateManager.GameState.Menu || GameManager.instance.gameStateManager.CurrentState == GameStateManager.GameState.Difficulty)
         {

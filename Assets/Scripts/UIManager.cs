@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     public GameObject DifficultyPanel;
     public GameObject GameWinPanel;
     public GameObject GameOverPanel;
+    public GameObject ControlsPanel;
 
 
     public void DisableAllMenuUI()
@@ -18,6 +19,7 @@ public class UIManager : MonoBehaviour
         GameWinPanel.SetActive(false);
         DifficultyPanel.SetActive(false);
         GameOverPanel.SetActive(false);
+        ControlsPanel.SetActive(false);
     }
 
     public void EnableMainMenuUI()
@@ -48,5 +50,11 @@ public class UIManager : MonoBehaviour
     {
        DisableAllMenuUI();
        GameOverPanel.SetActive(true);
+    }
+
+    public void EnableControlsUI()
+    {
+        DisableAllMenuUI();
+        ControlsPanel.SetActive(true);
     }
 }

@@ -129,6 +129,28 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void EnableInput()
+    {
+        // Subscribe to the events.
+        Actions.MoveEvent += GetInputVector;
+        Actions.DashEvent += Dash;
+        Actions.SpaceKeyPressed += OnSpaceKeyPressed;
+        Actions.SpaceKeyReleased += () => isJumping = false;
+
+        Actions.ShiftKeyPressed += OnShiftKeyPressed;
+        Actions.ShiftKeyReleased += OnShiftKeyReleased;
+    }
+    public void DisableInput()
+    {
+        // Subscribe to the events.
+        Actions.MoveEvent -= GetInputVector;
+        Actions.DashEvent -= Dash;
+        Actions.SpaceKeyPressed -= OnSpaceKeyPressed;
+        Actions.SpaceKeyReleased += () => isJumping = false;
+
+        Actions.ShiftKeyPressed -= OnShiftKeyPressed;
+        Actions.ShiftKeyReleased += OnShiftKeyReleased;
+    }
    
 
     private void Update()
