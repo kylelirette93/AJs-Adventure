@@ -16,7 +16,6 @@ public class Enemy : MonoBehaviour
     protected Rigidbody2D rigidbody2D;
     protected Vector2 moveDirection;
     protected bool movingLeft = true;
-    public HealthSystem healthSystem = new HealthSystem(100);
     bool canMove = true;
     private Object enemyRef;
     bool isDead = false;

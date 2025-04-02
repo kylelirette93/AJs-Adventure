@@ -60,7 +60,6 @@ public class PlayerController : MonoBehaviour
 
     float lastTimeJumped = -10.0f;
 
-    public HealthSystem healthSystem = new HealthSystem(100);
     public ParticleSystem dustParticles;
 
     Vector2 startingPosition;
@@ -410,6 +409,14 @@ public class PlayerController : MonoBehaviour
                 .SetDelay(dashTrailDuration * segmentProgress)
                 .OnComplete(() => Destroy(trailSegment));           
         }        
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            ResetPlayer();
+        }
     }
 
     void MovePlayer()
